@@ -34,8 +34,23 @@ export default class Indicator {
 
         this._indicator = new PanelMenu.Button(0.0, this._extension.metadata.name, false);
         this._indicator.add_child(this._box);
-        this._box.connect('button-press-event', () => {
-            this._onClicked?.();
+        this._box.connect('button-press-event', (_actor, event) => {
+            const button = event.get_button();
+            if (button === Clutter.BUTTON_PRIMARY)
+                this._onClicked?.();
+            else if (button === Clutter.BUTTON_MIDDLE) {
+                Gio.AppInfo.launch_default_for_uri_async('https://colab.research.google.com/', null, null, (_source, result) => {
+                    try {
+                        Gio.AppInfo.launch_default_for_uri_finish(result);
+                    } catch (error) {
+                        log.error('[Colab availability] Could not open Colab:', error);
+                    }
+                });
+            } else if (button === Clutter.BUTTON_SECONDARY) {
+                this._extension.openPreferences();
+            } else {
+                return Clutter.EVENT_PROPAGATE;
+            }
             return Clutter.EVENT_STOP;
         });
     }
