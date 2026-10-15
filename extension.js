@@ -13,7 +13,7 @@ export default class ColabAvailabilityExtension extends Extension {
         this._scheduler = new Scheduler(this);
 
         this._settings.enable(this._indicator, this._scheduler);
-        this._indicator.enable(this._settings, () => this._monitor.checkAvailability(true));
+        this._indicator.enable(this._settings, () => this._scheduler.restart());
         this._monitor.enable(this._settings, this._indicator);
         this._scheduler.enable(this._settings, this._monitor);
     }
