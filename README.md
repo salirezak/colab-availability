@@ -9,7 +9,9 @@ A GNOME Shell extension that checks whether Google Colab responds and shows the 
 
 - Checks [Google Colab](https://colab.research.google.com/) and displays the result in the panel.
 - Runs a check when the extension starts, then repeats it at the configured interval.
-- Click the indicator to run a check immediately.
+- Left-click the indicator to run a check immediately.
+- Middle-click the indicator to open Google Colab in the default browser.
+- Right-click the indicator to open its preferences.
 - Choose icon only, status text only, or both; adjust icon and text sizes.
 - Place the indicator in the left, center, or right panel section and set its order.
 - Configure the check interval and request timeout.
