@@ -37,6 +37,22 @@ export default class ColabAvailabilityPreferences extends ExtensionPreferences {
             icon_name: 'preferences-system-symbolic',
         });
 
+        // Mouse actions
+        const mouseGroup = new Adw.PreferencesGroup({
+            title: 'Mouse actions',
+            description: 'Use these clicks on the Colab indicator in the top bar.',
+        });
+
+        const mouseLabel = new Gtk.Label({
+            label:
+                '• <b>Left click:</b> Check Colab availability.\n' +
+                '• <b>Middle click:</b> Open Google Colab in your default browser.\n' +
+                '• <b>Right click:</b> Open these preferences.',
+            use_markup: true, xalign: 0, wrap: true, margin_top: 0,
+        });
+        mouseLabel.add_css_class('dim-label');
+        mouseGroup.add(mouseLabel);
+
         // Display mode
         const displayOptions = ['icon-only', 'text-only', 'both'];
         const displayLabels = ['Icon only', 'Text only', 'Both'];
@@ -306,6 +322,7 @@ export default class ColabAvailabilityPreferences extends ExtensionPreferences {
         resetGroup.add(resetRow);
 
         // Assemble page
+        page.add(mouseGroup);
         page.add(appearanceGroup);
         page.add(positionGroup);
         page.add(monitoringGroup);
