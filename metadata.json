@@ -4,5 +4,6 @@
   "uuid": "colab-availability@salirezak.github.io",
   "version": 1,
   "shell-version": ["50"],
-  "settings-schema": "org.gnome.shell.extensions.colab-availability"
+  "settings-schema": "org.gnome.shell.extensions.colab-availability",
+  "url": "https://github.com/salirezak/colab-availability"
 }
