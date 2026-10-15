@@ -38,6 +38,17 @@ gnome-extensions enable colab-availability@salirezak.github.io
 
 On Wayland, log out and back in if the extension does not appear after installation. You can also enable it with the **Extensions** app.
 
+### Testing during development
+
+To test the extension in a separate GNOME Shell Wayland session, install `mutter-devkit` if it is not already installed. Then run:
+
+```sh
+dbus-run-session gnome-shell --devkit --wayland
+```
+This starts a separate GNOME Shell devkit session for testing. The extension must already be installed in the standard GNOME Shell extensions directory. You may need to enable the extension separately.
+
+[More information about testing GNOME Shell extensions](https://gjs.guide/extensions/development/creating.html#testing-the-extension).
+
 ## Configuration
 
 Open the extension's preferences from the **Extensions** app or run:
