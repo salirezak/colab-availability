@@ -1,0 +1,8 @@
+{
+  "name": "Colab Availability",
+  "description": "Check Google Colab availability from the GNOME top bar",
+  "uuid": "colab-availability@salirezak.github.io",
+  "version": 1,
+  "shell-version": ["50"],
+  "settings-schema": "org.gnome.shell.extensions.colab-availability"
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="org.gnome.shell.extensions.colab-availability" path="/org/gnome/shell/extensions/colab-availability/">
+       <key name="display-mode" type="s">
+            <default>'both'</default>
+            <summary>Display mode</summary>
+            <description>Choose to show the icon, status text, or both.</description>
+        </key>
+
+        <key name="icon-size" type="i">
+            <default>24</default>
+            <range min="1" max="48"/>
+            <summary>Icon size</summary>
+            <description>Size of the indicator icon in pixels.</description>
+        </key>
+
+        <key name="font-size" type="i">
+            <default>14</default>
+            <range min="1" max="24"/>
+            <summary>Font size</summary>
+            <description>Size of the status text in pixels.</description>
+        </key>
+
+        <key name="position" type="i">
+            <default>0</default>
+            <range min="-20" max="20"/>
+            <summary>Position</summary>
+            <description>Position of the indicator within its panel section.</description>
+        </key>
+
+        <key name="panel-box" type="s">
+            <default>'left'</default>
+            <summary>Panel section</summary>
+            <description>Choose the panel section: left, center, or right.</description>
+        </key>
+
+        <key name="check-interval" type="i">
+            <default>10</default>
+            <range min="1" max="3600"/>
+            <summary>Check interval</summary>
+            <description>Time between status checks, in seconds.</description>
+        </key>
+
+        <key name="request-timeout" type="i">
+            <default>10</default>
+            <range min="1" max="120"/>
+            <summary>Request timeout</summary>
+            <description>Maximum time to wait for a response, in seconds.</description>
+        </key>
+    </schema>
+</schemalist>
