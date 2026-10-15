@@ -1,6 +1,3 @@
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-import Soup from 'gi://Soup?version=3.0';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import Indicator from './extension-indicator.js';
 import Settings from './extension-settings.js';
