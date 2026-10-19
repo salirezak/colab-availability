@@ -1,8 +1,8 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import Indicator from './extension-indicator.js';
-import Settings from './extension-settings.js';
-import Monitor from './extension-monitor.js';
-import Scheduler from './extention-scheduler.js';
+import Indicator from './modules/indicator.js';
+import Settings from './modules/settings.js';
+import Monitor from './modules/monitor.js';
+import Scheduler from './modules/scheduler.js';
 
 
 export default class ColabAvailabilityExtension extends Extension {
