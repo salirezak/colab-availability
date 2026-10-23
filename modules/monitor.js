@@ -86,7 +86,7 @@ export default class Monitor {
         if (code !== null) {
             if (code === 200) {
                 text = 'Available';
-                icon = this._indicator.okIcon;
+                icon = this._indicator.validIcon;
             } else {
                 text = `HTTP ${code}`;
                 icon = this._indicator.errorIcon;
