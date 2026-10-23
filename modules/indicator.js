@@ -14,6 +14,21 @@ function getIcon(extension, fileName) {
     );
 }
 
+const Y_ALIGN = Clutter.ActorAlign.CENTER;
+const ICON_STYLE = 'padding: 0px; margin: 0px;';
+const BOX_STYLE = 'spacing: 6px;';
+const TOOLTIP_STYLE = [
+    'padding: 7px 11px;',
+    'border-radius: 8px;',
+    'background-color: rgba(30, 30, 30, 0.96);',
+    'color: #ffffff;',
+    'font-size: 0.95em;',
+    'font-weight: 500;',
+    'box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);',
+].join(' ');
+const SUFFIX_TEXT = 'Colab: ';
+const COLAB_URL = 'https://colab.research.google.com/';
+
 
 export default class Indicator {
     constructor(extension) {
@@ -24,21 +39,23 @@ export default class Indicator {
 
         this._initializeIcons();
         this._initializeLabels();
-        this._initializeTooltip();
 
-        this._icon = new St.Icon({style_class: 'system-status-icon', style: 'padding: 0px; margin: 0px;', y_align: Clutter.ActorAlign.CENTER});
+        this._icon = new St.Icon({style_class: 'system-status-icon', style: ICON_STYLE, y_align: Y_ALIGN});
 
-        this._label = new St.BoxLayout({y_align: Clutter.ActorAlign.CENTER});
+        this._label = new St.BoxLayout({y_align: Y_ALIGN});
         this._label.add_child(this._suffixLabel);
         this._label.add_child(this._statusLabel);
 
-        this._box = new St.BoxLayout({style: 'spacing: 6px', y_align: Clutter.ActorAlign.CENTER, reactive: true});
+        this._box = new St.BoxLayout({reactive: true, style: BOX_STYLE, y_align: Y_ALIGN});
         this._box.add_child(this._icon);
         this._box.add_child(this._label);
 
         this._indicator = new PanelMenu.Button(0.0, this._extension.metadata.name, false);
         this._indicator.add_child(this._box);
+
+        this._tooltip = new St.Label({visible: false, reactive: false, style: TOOLTIP_STYLE, y_align: Y_ALIGN});
         Main.uiGroup.add_child(this._tooltip);
+
         this._indicator.connect('enter-event', this._onHover.bind(this));
         this._indicator.connect('leave-event', this._onHoverLeave.bind(this));
         this._box.connect('button-press-event', this._onPress.bind(this));
@@ -85,25 +102,8 @@ export default class Indicator {
     }
 
     _initializeLabels() {
-        const SUFFIX_TEXT = 'Colab: ';
-        this._suffixLabel = new St.Label({text: SUFFIX_TEXT, y_align: Clutter.ActorAlign.CENTER});
-        this._statusLabel = new St.Label({y_align: Clutter.ActorAlign.CENTER});
-    }
-
-    _initializeTooltip() {
-        this._tooltip = new St.Label({
-            style: [
-                'padding: 7px 11px;',
-                'border-radius: 8px;',
-                'background-color: rgba(30, 30, 30, 0.96);',
-                'color: #ffffff;',
-                'font-size: 0.95em;',
-                'font-weight: 500;',
-                'box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);',
-            ].join(' '),
-            visible: false,
-            reactive: false,
-        });
+        this._suffixLabel = new St.Label({text: SUFFIX_TEXT, y_align: Y_ALIGN});
+        this._statusLabel = new St.Label({y_align: Y_ALIGN});
     }
 
     _onPress(_actor, event) {
@@ -111,7 +111,7 @@ export default class Indicator {
         if (button === Clutter.BUTTON_PRIMARY)
             this._onClicked?.();
         else if (button === Clutter.BUTTON_MIDDLE) {
-            Gio.AppInfo.launch_default_for_uri_async('https://colab.research.google.com/', null, null, (_source, result) => {
+            Gio.AppInfo.launch_default_for_uri_async(COLAB_URL, null, null, (_source, result) => {
                 try {
                     Gio.AppInfo.launch_default_for_uri_finish(result);
                 } catch (error) {
