@@ -34,6 +34,28 @@ export default class Indicator {
 
         this._indicator = new PanelMenu.Button(0.0, this._extension.metadata.name, false);
         this._indicator.add_child(this._box);
+        this._tooltip = new St.Label({
+            style: [
+                'padding: 7px 11px;',
+                'border-radius: 8px;',
+                'background-color: rgba(30, 30, 30, 0.96);',
+                'color: #ffffff;',
+                'font-size: 0.95em;',
+                'font-weight: 500;',
+                'box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);',
+            ].join(' '),
+            visible: false,
+            reactive: false,
+        });
+        Main.uiGroup.add_child(this._tooltip);
+        this._indicator.connect('enter-event', () => {
+            this._showTooltip();
+            return Clutter.EVENT_PROPAGATE;
+        });
+        this._indicator.connect('leave-event', () => {
+            this._tooltip.hide();
+            return Clutter.EVENT_PROPAGATE;
+        });
         this._box.connect('button-press-event', (_actor, event) => {
             const button = event.get_button();
             if (button === Clutter.BUTTON_PRIMARY)
@@ -80,6 +102,8 @@ export default class Indicator {
         this._label = null;
 
         this._box = null;
+        this._tooltip?.destroy();
+        this._tooltip = null;
         this._indicator.destroy();
         this._indicator = null;
     }
@@ -128,9 +152,28 @@ export default class Indicator {
         this._statusLabel.set_style(STYLE);
     }
 
+    _showTooltip() {
+        if (!this._icon || !this._tooltip || !this._statusLabel)
+            return;
+
+        this._tooltip.set_text(this._statusLabel.text);
+        const [x, y] = this._indicator.get_transformed_position();
+        const [width, height] = this._indicator.get_transformed_size();
+        const [, tooltipWidth] = this._tooltip.get_preferred_width(-1);
+        this._tooltip.set_position(
+            Math.round(x + (width - tooltipWidth) / 2),
+            Math.round(y + height + 6)
+        );
+        this._tooltip.show();
+    }
+
     setStatus(text=null, icon=null) {
-        if (text !== null && this._statusLabel)
+        if (text !== null && this._statusLabel) {
             this._statusLabel.set_text(text);
+            this._updateDisplayMode();
+            if (this._indicator?.hover)
+                this._showTooltip();
+        }
         if (icon !== null && this._icon)
             this._icon.gicon = icon;
     }
