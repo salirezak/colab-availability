@@ -184,12 +184,14 @@ export default class Indicator {
             return;
 
         this._tooltip.set_text(this._statusLabel.text);
-        const [x, y] = this._indicator.get_transformed_position();
-        const [width, height] = this._indicator.get_transformed_size();
+        const [x] = this._indicator.get_transformed_position();
+        const [width] = this._indicator.get_transformed_size();
+        const [, panelY] = Main.panel.get_transformed_position();
+        const [, panelHeight] = Main.panel.get_transformed_size();
         const [, tooltipWidth] = this._tooltip.get_preferred_width(-1);
         this._tooltip.set_position(
             Math.round(x + (width - tooltipWidth) / 2),
-            Math.round(y + height + 6)
+            Math.round(panelY + panelHeight + 4)
         );
         this._tooltip.show();
     }
