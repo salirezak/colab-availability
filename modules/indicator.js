@@ -64,7 +64,7 @@ export default class Indicator {
     enable(settings, onClicked) {
         this._settings = settings;
         this._onClicked = onClicked;
-        this.setStatus('Initializing', this.checkIcon);
+        this.setStatus('Initializing', this.checkIcon, true);
         this._updatePosition();
         this._updateDisplayMode();
         this._updateIconSize();
@@ -76,6 +76,7 @@ export default class Indicator {
         this._onClicked = null;
         this._isRegistered = false;
 
+        this.stopLoadingAnimation();
         this.checkIcon = null;
         this.errorIcon = null;
         this.validIcon = null;
@@ -96,9 +97,6 @@ export default class Indicator {
         this.checkIcon = getIcon(this._extension, 'check.svg');
         this.errorIcon = getIcon(this._extension, 'error.svg');
         this.validIcon = getIcon(this._extension, 'valid.svg');
-        this.checkLoadingIcon = getIcon(this._extension, 'check-loading.svg');
-        this.errorLoadingIcon = getIcon(this._extension, 'error-loading.svg');
-        this.validLoadingIcon = getIcon(this._extension, 'valid-loading.svg');
     }
 
     _initializeLabels() {
@@ -196,7 +194,7 @@ export default class Indicator {
         this._tooltip.show();
     }
 
-    setStatus(text=null, icon=null) {
+    setStatus(text=null, icon=null, loading=null) {
         if (text !== null && this._statusLabel) {
             this._statusLabel.set_text(text);
             if (this._indicator?.hover)
@@ -204,5 +202,35 @@ export default class Indicator {
         }
         if (icon !== null && this._icon)
             this._icon.gicon = icon;
+
+        if (loading !== null) {
+            if (loading)
+                this.startLoadingAnimation();
+            else
+                this.stopLoadingAnimation();
+        }
+    }
+
+    startLoadingAnimation() {
+        if (!this._icon)
+            return;
+        this.stopLoadingAnimation();
+
+        const transition = new Clutter.PropertyTransition({property_name: 'opacity'});
+        transition.set_from(255);
+        transition.set_to(100);
+        transition.set_duration(200);
+        transition.set_repeat_count(-1);
+        transition.set_auto_reverse(true);
+        transition.set_progress_mode(Clutter.AnimationMode.EASE_IN_OUT);
+        this._icon.add_transition('loading', transition);
+    }
+
+    stopLoadingAnimation() {
+        if (!this._icon)
+            return;
+
+        this._icon.remove_transition('loading');
+        this._icon.opacity = 255;
     }
 }

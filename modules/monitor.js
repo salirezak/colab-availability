@@ -41,15 +41,16 @@ export default class Monitor {
         this._isChecking = true;
 
         try {
-            this._indicator.setStatus('Checking', null);
+            this._indicator.setStatus(null, null, true);
             if (!Gio.NetworkMonitor.get_default().get_network_available()) {
-                this._indicator.setStatus('No internet', this._indicator.errorIcon);
+                this._indicator.setStatus('No internet', this._indicator.errorIcon, false);
                 return;
             }
             await this._requestAvailability(cancellable, requestId);
         } catch (err) {
             if (requestId !== this._requestId)
                 return;
+            this._indicator.setStatus(`Error ${err.message}`, this._indicator.errorIcon, false);
             console.error('[Colab availability][ERROR]:', err);
         } finally {
             if (requestId === this._requestId) {
@@ -100,9 +101,9 @@ export default class Monitor {
             } else if (error.matches?.(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)) {
                 return;
             } else {
-                text = 'Error';
+                text = `Error ${error.message}`;
             }
         }
-        this._indicator.setStatus(text, icon);
+        this._indicator.setStatus(text, icon, false);
     }
 }
