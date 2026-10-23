@@ -13,12 +13,19 @@ export default class Indicator {
         this._onClicked = null;
         this._isRegistered = false;
 
-        const OK_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'colab-ok.png',]);
-        const ERROR_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'colab-error.png',]);
-        const BUSY_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'colab-busy.png']);
-        this.busyIcon = Gio.FileIcon.new(Gio.File.new_for_path(BUSY_ICON_PATH));
+        const VALID_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid.svg',]);
+        const ERROR_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error.svg',]);
+        const CHECK_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check.svg',]);
+        const VALID_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid-loading.svg',]);
+        const ERROR_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error-loading.svg',]);
+        const CHECK_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check-loading.svg',]);
+
+        this.checkIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_ICON_PATH));
         this.errorIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_ICON_PATH));
-        this.okIcon = Gio.FileIcon.new(Gio.File.new_for_path(OK_ICON_PATH));
+        this.validIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_ICON_PATH));
+        this.checkLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_LOADING_ICON_PATH));
+        this.errorLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_LOADING_ICON_PATH));
+        this.validLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_LOADING_ICON_PATH));
         this._icon = new St.Icon({style_class: 'system-status-icon', style: 'padding: 0px; margin: 0px;', y_align: Clutter.ActorAlign.CENTER});
 
         const SUFFIX_TEXT = 'Colab: ';
@@ -80,7 +87,7 @@ export default class Indicator {
     enable(settings, onClicked) {
         this._settings = settings;
         this._onClicked = onClicked;
-        this.setStatus('Initializing', this.busyIcon);
+        this.setStatus('Initializing', this.checkIcon);
         this._updatePosition();
         this._updateDisplayMode();
         this._updateIconSize();
@@ -92,9 +99,9 @@ export default class Indicator {
         this._onClicked = null;
         this._isRegistered = false;
 
-        this.busyIcon = null;
+        this.checkIcon = null;
         this.errorIcon = null;
-        this.okIcon = null;
+        this.validIcon = null;
         this._icon = null;
 
         this._suffixLabel = null;
