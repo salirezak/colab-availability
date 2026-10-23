@@ -55,33 +55,9 @@ export default class Indicator {
             reactive: false,
         });
         Main.uiGroup.add_child(this._tooltip);
-        this._indicator.connect('enter-event', () => {
-            this._showTooltip();
-            return Clutter.EVENT_PROPAGATE;
-        });
-        this._indicator.connect('leave-event', () => {
-            this._tooltip.hide();
-            return Clutter.EVENT_PROPAGATE;
-        });
-        this._box.connect('button-press-event', (_actor, event) => {
-            const button = event.get_button();
-            if (button === Clutter.BUTTON_PRIMARY)
-                this._onClicked?.();
-            else if (button === Clutter.BUTTON_MIDDLE) {
-                Gio.AppInfo.launch_default_for_uri_async('https://colab.research.google.com/', null, null, (_source, result) => {
-                    try {
-                        Gio.AppInfo.launch_default_for_uri_finish(result);
-                    } catch (error) {
-                        log.error('[Colab availability] Could not open Colab:', error);
-                    }
-                });
-            } else if (button === Clutter.BUTTON_SECONDARY) {
-                this._extension.openPreferences();
-            } else {
-                return Clutter.EVENT_PROPAGATE;
-            }
-            return Clutter.EVENT_STOP;
-        });
+        this._indicator.connect('enter-event', this._onHover.bind(this));
+        this._indicator.connect('leave-event', this._onHoverLeave.bind(this));
+        this._box.connect('button-press-event', this._onPress.bind(this));
     }
 
     enable(settings, onClicked) {
@@ -115,6 +91,35 @@ export default class Indicator {
         this._indicator = null;
     }
 
+    _onPress(_actor, event) {
+        const button = event.get_button();
+        if (button === Clutter.BUTTON_PRIMARY)
+            this._onClicked?.();
+        else if (button === Clutter.BUTTON_MIDDLE) {
+            Gio.AppInfo.launch_default_for_uri_async('https://colab.research.google.com/', null, null, (_source, result) => {
+                try {
+                    Gio.AppInfo.launch_default_for_uri_finish(result);
+                } catch (error) {
+                    log.error('[Colab availability] Could not open Colab:', error);
+                }
+            });
+        } else if (button === Clutter.BUTTON_SECONDARY) {
+            this._extension.openPreferences();
+        } else {
+            return Clutter.EVENT_PROPAGATE;
+        }
+        return Clutter.EVENT_STOP;
+    }
+
+    _onHover() {
+        this._showTooltip();
+        return Clutter.EVENT_PROPAGATE;
+    }
+
+    _onHoverLeave() {
+        this._tooltip.hide();
+        return Clutter.EVENT_PROPAGATE;
+    }
 
     _updatePosition() {
         if (!this._indicator)
@@ -177,7 +182,6 @@ export default class Indicator {
     setStatus(text=null, icon=null) {
         if (text !== null && this._statusLabel) {
             this._statusLabel.set_text(text);
-            this._updateDisplayMode();
             if (this._indicator?.hover)
                 this._showTooltip();
         }
