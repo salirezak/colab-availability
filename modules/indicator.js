@@ -6,6 +6,15 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
 
+function getIcon(extension, fileName) {
+    return Gio.FileIcon.new(
+        Gio.File.new_for_path(
+            GLib.build_filenamev([extension.path, 'icons', fileName])
+        )
+    );
+}
+
+
 export default class Indicator {
     constructor(extension) {
         this._extension = extension;
@@ -67,19 +76,12 @@ export default class Indicator {
     }
 
     _initializeIcons() {
-        const VALID_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid.svg',]);
-        const ERROR_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error.svg',]);
-        const CHECK_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check.svg',]);
-        const VALID_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid-loading.svg',]);
-        const ERROR_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error-loading.svg',]);
-        const CHECK_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check-loading.svg',]);
-
-        this.checkIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_ICON_PATH));
-        this.errorIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_ICON_PATH));
-        this.validIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_ICON_PATH));
-        this.checkLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_LOADING_ICON_PATH));
-        this.errorLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_LOADING_ICON_PATH));
-        this.validLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_LOADING_ICON_PATH));
+        this.checkIcon = getIcon(this._extension, 'check.svg');
+        this.errorIcon = getIcon(this._extension, 'error.svg');
+        this.validIcon = getIcon(this._extension, 'valid.svg');
+        this.checkLoadingIcon = getIcon(this._extension, 'check-loading.svg');
+        this.errorLoadingIcon = getIcon(this._extension, 'error-loading.svg');
+        this.validLoadingIcon = getIcon(this._extension, 'valid-loading.svg');
     }
 
     _initializeLabels() {
