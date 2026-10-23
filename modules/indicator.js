@@ -13,24 +13,12 @@ export default class Indicator {
         this._onClicked = null;
         this._isRegistered = false;
 
-        const VALID_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid.svg',]);
-        const ERROR_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error.svg',]);
-        const CHECK_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check.svg',]);
-        const VALID_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid-loading.svg',]);
-        const ERROR_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error-loading.svg',]);
-        const CHECK_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check-loading.svg',]);
+        this._initializeIcons();
+        this._initializeLabels();
+        this._initializeTooltip();
 
-        this.checkIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_ICON_PATH));
-        this.errorIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_ICON_PATH));
-        this.validIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_ICON_PATH));
-        this.checkLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_LOADING_ICON_PATH));
-        this.errorLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_LOADING_ICON_PATH));
-        this.validLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_LOADING_ICON_PATH));
         this._icon = new St.Icon({style_class: 'system-status-icon', style: 'padding: 0px; margin: 0px;', y_align: Clutter.ActorAlign.CENTER});
 
-        const SUFFIX_TEXT = 'Colab: ';
-        this._suffixLabel = new St.Label({text: SUFFIX_TEXT, y_align: Clutter.ActorAlign.CENTER});
-        this._statusLabel = new St.Label({y_align: Clutter.ActorAlign.CENTER});
         this._label = new St.BoxLayout({y_align: Clutter.ActorAlign.CENTER});
         this._label.add_child(this._suffixLabel);
         this._label.add_child(this._statusLabel);
@@ -41,19 +29,6 @@ export default class Indicator {
 
         this._indicator = new PanelMenu.Button(0.0, this._extension.metadata.name, false);
         this._indicator.add_child(this._box);
-        this._tooltip = new St.Label({
-            style: [
-                'padding: 7px 11px;',
-                'border-radius: 8px;',
-                'background-color: rgba(30, 30, 30, 0.96);',
-                'color: #ffffff;',
-                'font-size: 0.95em;',
-                'font-weight: 500;',
-                'box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);',
-            ].join(' '),
-            visible: false,
-            reactive: false,
-        });
         Main.uiGroup.add_child(this._tooltip);
         this._indicator.connect('enter-event', this._onHover.bind(this));
         this._indicator.connect('leave-event', this._onHoverLeave.bind(this));
@@ -89,6 +64,44 @@ export default class Indicator {
         this._tooltip = null;
         this._indicator.destroy();
         this._indicator = null;
+    }
+
+    _initializeIcons() {
+        const VALID_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid.svg',]);
+        const ERROR_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error.svg',]);
+        const CHECK_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check.svg',]);
+        const VALID_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'valid-loading.svg',]);
+        const ERROR_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'error-loading.svg',]);
+        const CHECK_LOADING_ICON_PATH = GLib.build_filenamev([this._extension.path, 'icons', 'check-loading.svg',]);
+
+        this.checkIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_ICON_PATH));
+        this.errorIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_ICON_PATH));
+        this.validIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_ICON_PATH));
+        this.checkLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(CHECK_LOADING_ICON_PATH));
+        this.errorLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(ERROR_LOADING_ICON_PATH));
+        this.validLoadingIcon = Gio.FileIcon.new(Gio.File.new_for_path(VALID_LOADING_ICON_PATH));
+    }
+
+    _initializeLabels() {
+        const SUFFIX_TEXT = 'Colab: ';
+        this._suffixLabel = new St.Label({text: SUFFIX_TEXT, y_align: Clutter.ActorAlign.CENTER});
+        this._statusLabel = new St.Label({y_align: Clutter.ActorAlign.CENTER});
+    }
+
+    _initializeTooltip() {
+        this._tooltip = new St.Label({
+            style: [
+                'padding: 7px 11px;',
+                'border-radius: 8px;',
+                'background-color: rgba(30, 30, 30, 0.96);',
+                'color: #ffffff;',
+                'font-size: 0.95em;',
+                'font-weight: 500;',
+                'box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);',
+            ].join(' '),
+            visible: false,
+            reactive: false,
+        });
     }
 
     _onPress(_actor, event) {
