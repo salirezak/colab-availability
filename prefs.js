@@ -21,7 +21,7 @@ export default class ColabAvailabilityPreferences extends ExtensionPreferences {
         const intervalRow = this._createSpinRow(settings, 'check-interval', 'Check interval', 'Time between automatic status checks, in seconds.', 1, 3600);
         monitoringGroup.add(intervalRow);
         // Reset Settings
-        const resetRow = this._createResetRow(settings, ['auto-check', 'check-interval']);
+        const resetRow = this._createResetRow(settings, ['check-interval']);
         resetGroup.add(resetRow);
     }
 
