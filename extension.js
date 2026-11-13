@@ -1,32 +1,102 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import Indicator from './modules/indicator.js';
-import Settings from './modules/settings.js';
-import Monitor from './modules/monitor.js';
-import Scheduler from './modules/scheduler.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { SettingsManager } from './lib/settings.js';
+import { ColabIndicator } from './lib/indicator.js';
+import { ColabNetwork } from './lib/network.js';
+import { ColabScheduler } from './lib/scheduler.js';
+
 
 
 export default class ColabAvailabilityExtension extends Extension {
     enable() {
-        this._settings = new Settings(this);
-        this._indicator = new Indicator(this);
-        this._monitor = new Monitor(this);
-        this._scheduler = new Scheduler(this);
+        this._settingsManager = new SettingsManager(this);
+        this._indicator = new ColabIndicator(this);
+        this._network = new ColabNetwork();
+        this._scheduler = new ColabScheduler();
 
-        this._settings.enable(this._indicator, this._scheduler);
-        this._indicator.enable(this._settings, () => this._scheduler.restart());
-        this._monitor.enable(this._settings, this._indicator);
-        this._scheduler.enable(this._settings, this._monitor);
+        Main.panel.addToStatusArea(this.uuid, this._indicator, 1, 'left');
+
+        this._settingsManagerSignalIds = [
+            this._settingsManager.connect('interval-changed', () => this._performCheck(false))
+        ];
+        this._indicatorSignalIds = [
+            this._indicator.connect('check-clicked', () => this._performCheck(true))
+        ];
+        this._networkSignalIds = [
+            this._network.connect('check-result', (_, state, statusText, detailText) => this._onCheckResult(state, statusText, detailText)),
+            this._network.connect('internet-online', () => this._performCheck(true)),
+            this._network.connect('internet-offline', () => this._onNoInternet()),
+        ];
+        this._schedulerSignalIds = [
+            this._scheduler.connect('check-required', () => this._performCheck(false)),
+        ];
+
+        this._performCheck(false);
+    }
+
+    _performCheck(force = false) {
+        if (this._scheduler) {
+            this._scheduler.stop();
+        }
+        if (!this._indicator || !this._network) {
+            return;
+        }
+        if (!this._network.isInternetAvailable) {
+            this._onNoInternet();
+            return;
+        }
+        this._indicator.setProcessing(true);
+        this._network.checkAvailability(force);
+    }
+
+    _onCheckResult(state, statusText, detailText) {
+        if (this._scheduler && this._network.isInternetAvailable) {
+            this._scheduler.start(this._settingsManager.getCheckInterval());
+        }
+        if (this._indicator) {
+            this._indicator.setProcessing(false);
+            this._indicator.setStatus(state, statusText, detailText);
+        }
+
+    }
+
+    _onNoInternet() {
+        if (this._scheduler) {
+            this._scheduler.stop();
+        }
+        if (this._indicator) {
+            this._indicator.setProcessing(false);
+            this._indicator.setStatus('pending', 'No Internet', '');
+        }
+
     }
 
     disable() {
-        this._settings?.disable();
-        this._indicator?.disable();
-        this._monitor?.disable();
-        this._scheduler?.disable();
+        this._settingsManagerSignalIds.forEach(id => this._settingsManager.disconnect(id));
+        this._indicatorSignalIds.forEach(id => this._indicator.disconnect(id));
+        this._networkSignalIds.forEach(id => this._network.disconnect(id));
+        this._schedulerSignalIds.forEach(id => this._scheduler.disconnect(id));
 
-        this._settings = null;
-        this._indicator = null;
-        this._monitor = null;
-        this._scheduler = null;
+        this._settingsManagerSignalIds = [];
+        this._indicatorSignalIds = [];
+        this._networkSignalIds = [];
+        this._schedulerSignalIds = [];
+
+        if (this._scheduler) {
+            this._scheduler.destroy();
+            this._scheduler = null;
+        }
+        if (this._network) {
+            this._network.destroy();
+            this._network = null;
+        }
+        if (this._indicator) {
+            this._indicator.destroy();
+            this._indicator = null;
+        }
+        if (this._settingsManager) {
+            this._settingsManager.destroy();
+            this._settingsManager = null;
+        }
     }
 }
