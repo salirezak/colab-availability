@@ -42,6 +42,9 @@ export default class ColabAvailabilityExtension extends Extension {
     }
 
     _performCheck(force = false) {
+        if (this._scheduler) {
+            this._scheduler.stop();
+        }
         if (!this._indicator || !this._network) {
             return;
         }
@@ -54,6 +57,7 @@ export default class ColabAvailabilityExtension extends Extension {
     }
 
     _onCheckResult(state, statusText, detailText) {
+        this._scheduler?.start(this._settingsManager.getCheckInterval());
         this._indicator?.setProcessing(false);
         this._indicator?.setStatus(state, statusText, detailText);
     }
@@ -63,10 +67,12 @@ export default class ColabAvailabilityExtension extends Extension {
         this._scheduler?.stop();
         this._indicator?.setProcessing(false);
         this._indicator?.setStatus('pending', 'No Internet', '');
+        this._indicator?.setCheckButtonEnabled(false);
     }
 
     _onOnline() {
         this._scheduler?.start(this._settingsManager.getCheckInterval());
+        this._indicator?.setCheckButtonEnabled(true);
         this._performCheck(true);
     }
 
