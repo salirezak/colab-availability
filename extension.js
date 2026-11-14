@@ -16,19 +16,26 @@ export default class ColabAvailabilityExtension extends Extension {
 
         Main.panel.addToStatusArea(this.uuid, this._indicator, 1, 'left');
 
-        this._settingsManagerSignalIds = [
-            this._settingsManager.connect('interval-changed', () => this._performCheck(false))
-        ];
-        this._indicatorSignalIds = [
-            this._indicator.connect('check-clicked', () => this._performCheck(true))
-        ];
-        this._networkSignalIds = [
-            this._network.connect('check-result', (_, state, statusText, detailText) => this._onCheckResult(state, statusText, detailText)),
-            this._network.connect('internet-online', () => this._performCheck(true)),
-            this._network.connect('internet-offline', () => this._onNoInternet()),
-        ];
-        this._schedulerSignalIds = [
-            this._scheduler.connect('check-required', () => this._performCheck(false)),
+        this._signalIds = [
+            [
+                this._settingsManager,
+                this._settingsManager.connect('interval-changed', () => this._performCheck(false))
+            ], [
+                this._indicator,
+                this._indicator.connect('check-clicked', () => this._performCheck(true))
+            ], [
+                this._network,
+                this._network.connect('check-result', (_, state, statusText, detailText) => this._onCheckResult(state, statusText, detailText))
+            ], [
+                this._network,
+                this._network.connect('internet-online', () => this._performCheck(true))
+            ], [
+                this._network,
+                this._network.connect('internet-offline', () => this._onNoInternet())
+            ], [
+                this._scheduler,
+                this._scheduler.connect('check-required', () => this._performCheck(false))
+            ]
         ];
 
         this._performCheck(false);
@@ -72,15 +79,8 @@ export default class ColabAvailabilityExtension extends Extension {
     }
 
     disable() {
-        this._settingsManagerSignalIds.forEach(id => this._settingsManager.disconnect(id));
-        this._indicatorSignalIds.forEach(id => this._indicator.disconnect(id));
-        this._networkSignalIds.forEach(id => this._network.disconnect(id));
-        this._schedulerSignalIds.forEach(id => this._scheduler.disconnect(id));
-
-        this._settingsManagerSignalIds = [];
-        this._indicatorSignalIds = [];
-        this._networkSignalIds = [];
-        this._schedulerSignalIds = [];
+        this._signalIds.forEach(([object, id]) => { if (object.is_connected(id)) object.disconnect(id) });
+        this._signalIds = [];
 
         if (this._scheduler) {
             this._scheduler.destroy();
