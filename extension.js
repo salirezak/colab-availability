@@ -80,7 +80,7 @@ export default class ColabAvailabilityExtension extends Extension {
     }
 
     disable() {
-        this._signalIds.forEach(([object, id]) => { if (object.is_connected(id)) object.disconnect(id) });
+        this._signalIds.forEach(([obj, id]) => { obj.disconnect(id) });
         this._signalIds = [];
 
         if (this._scheduler) {
