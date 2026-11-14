@@ -28,10 +28,10 @@ export default class ColabAvailabilityExtension extends Extension {
                 this._network.connect('check-result', (_, state, statusText, detailText) => this._onCheckResult(state, statusText, detailText))
             ], [
                 this._network,
-                this._network.connect('internet-online', () => this._performCheck(true))
+                this._network.connect('internet-online', () => this._onOnline())
             ], [
                 this._network,
-                this._network.connect('internet-offline', () => this._onNoInternet())
+                this._network.connect('internet-offline', () => this._onOffline())
             ], [
                 this._scheduler,
                 this._scheduler.connect('check-required', () => this._performCheck(false))
@@ -49,7 +49,7 @@ export default class ColabAvailabilityExtension extends Extension {
             return;
         }
         if (!this._network.isInternetAvailable) {
-            this._onNoInternet();
+            this._onOffline();
             return;
         }
         this._indicator.setProcessing(true);
@@ -67,15 +67,16 @@ export default class ColabAvailabilityExtension extends Extension {
 
     }
 
-    _onNoInternet() {
-        if (this._scheduler) {
-            this._scheduler.stop();
-        }
-        if (this._indicator) {
-            this._indicator.setProcessing(false);
-            this._indicator.setStatus('pending', 'No Internet', '');
-        }
+    _onOffline() {
+        this._network?.cancelCheck();
+        this._scheduler?.stop();
+        this._indicator?.setProcessing(false);
+        this._indicator?.setStatus('pending', 'No Internet', '');
+    }
 
+    _onOnline() {
+        this._scheduler?.start(this._settingsManager.getCheckInterval());
+        this._performCheck(true);
     }
 
     disable() {
